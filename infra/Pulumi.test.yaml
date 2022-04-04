@@ -1,0 +1,5 @@
+config:
+  aws-py-static-website:pathToWebsiteContents: ./www
+  aws-py-static-website:targetDomain: cloud.notubes.link
+  aws:region: us-east-1
+  static-website:includeWWW: "true"
