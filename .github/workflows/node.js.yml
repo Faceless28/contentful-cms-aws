@@ -23,7 +23,6 @@ jobs:
           cache-dependency-path: react-app/package-lock.json    
       - run: npm install
       - run: npm run build --if-present
-      - run: echo $(pwd) && ls && tree
       - uses: actions/upload-artifact@v2
         with:
           name: my-build
@@ -41,4 +40,12 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: my-build
-      - run: echo $(pwd) && ls && tree
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Copy files to the s3 website content bucket
+        run:
+          aws s3 sync ./ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete      
