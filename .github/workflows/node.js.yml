@@ -30,12 +30,12 @@ jobs:
          path: public/
          
   deploy:
-
+  
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
-
+    needs: build
     steps:
       - uses: actions/download-artifact@v2
         with:
