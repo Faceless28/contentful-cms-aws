@@ -26,8 +26,9 @@ jobs:
       - run: echo $(pwd) && ls && tree
       - uses: actions/upload-artifact@v2
         with:
-         name: my-build
-         path: ./public/
+          name: my-build
+          path: react-app/public
+          if-no-files-found: error
          
   deploy:
   
