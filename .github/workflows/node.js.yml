@@ -27,7 +27,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: my-build
-          path: react-app/public
+          path: react-app/build
           if-no-files-found: error
          
   deploy:
