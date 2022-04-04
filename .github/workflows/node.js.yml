@@ -3,11 +3,18 @@ name: Node.js CI
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'react-app/**'
+      - '.github/**'
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./react-app
 
     steps:
       - uses: actions/checkout@v3
@@ -16,5 +23,32 @@ jobs:
         with:
           node-version: '14.x'
           cache: 'npm'
+          cache-dependency-path: react-app/package-lock.json    
       - run: npm install
       - run: npm run build --if-present
+      - uses: actions/upload-artifact@v2
+        with:
+          name: my-build
+          path: react-app/build
+          if-no-files-found: error
+         
+  deploy:
+  
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: my-build
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Copy files to the s3 website content bucket
+        run:
+          aws s3 sync ./ s3://${{ secrets.AWS_S3_BUCKET_NAME }}/ --delete      
