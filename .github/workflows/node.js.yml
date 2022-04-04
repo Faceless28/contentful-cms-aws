@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
+        shell: bash
         working-directory: ./react-app
 
     steps:
@@ -19,5 +20,6 @@ jobs:
         with:
           node-version: '14.x'
           cache: 'npm'
+      - run: echo $(pwd)    
       - run: npm install
       - run: npm run build --if-present
