@@ -24,3 +24,20 @@ jobs:
       - run: echo $(pwd)    
       - run: npm install
       - run: npm run build --if-present
+      - uses: actions/upload-artifact@v2
+        with:
+         name: my-build
+         path: public/
+         
+  deploy:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: my-build
+      - run: echo $(pwd) && ls && tree
