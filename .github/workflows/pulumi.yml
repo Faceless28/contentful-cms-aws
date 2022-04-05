@@ -3,8 +3,8 @@ on:
   push:
     branches: [ dev ]
     paths:
-      - 'infre/**'
-      - '.github/**'
+      - 'infra/**'
+      - '.github/workflows/pulumi.yml'
 jobs:
   up:
     name: Update
