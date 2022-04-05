@@ -8,8 +8,6 @@ on:
       - '.github/**'
 
 jobs:
-
-jobs:
   call-workflow-nodejs:
     uses: ./.github/workflows/node.js.yml
 
