@@ -11,7 +11,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./infra
+        working-directory: ./
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/echo@v1
+      #- uses: actions/checkout@v2
+      - uses: ./.github/actions/echo.yml
