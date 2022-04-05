@@ -9,11 +9,11 @@ on:
 
 jobs:
   call-workflow-nodejs:
-    uses: ./.github/workflows/node.js.yml
+    uses: ./.github/workflows/node_workflow/node.js.yml
 
   call-workflow-s3-sync:
     needs: call-workflow-nodejs
-    uses: ./.github/workflows/s3-sync.yml
+    uses: ./.github/workflows/node_workflow/s3-sync.yml
     secrets:
       access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
       secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
