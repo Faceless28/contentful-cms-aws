@@ -24,6 +24,6 @@ jobs:
       - uses: pulumi/actions@v3
         with:
           command: up
-          stack-name: test
+          stack-name: https://app.pulumi.com/Faceless28/aws-py-static-website/test
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
