@@ -19,3 +19,7 @@ runs:
       if: github.ref == 'refs/heads/dev'
       run: echo "stack_env=test" >> $GITHUB_ENV
       shell: bash
+    - name: simple evaluation on dev
+      if: github.ref == 'refs/heads/dev'
+      run: echo "$stack_env"
+      shell: bash
