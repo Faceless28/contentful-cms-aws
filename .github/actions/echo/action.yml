@@ -17,5 +17,5 @@ runs:
       shell: bash
     - name: simple evaluation on dev
       if: github.ref == 'refs/heads/dev'
-      run: echo Hello ${{ inputs.greet }} dev branch.
+      run: echo "stack_env=test" >> $GITHUB_ENV
       shell: bash
