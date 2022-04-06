@@ -10,6 +10,11 @@ outputs:
     value: ${{ steps.random-number-generator.outputs.random-id }}
 runs:
   using: "composite"
+  if: ${{ github.ref == 'refs/heads/dev' }}
+  steps:
+    - run: echo Hello ${{ inputs.greet }} dev branch.
+      shell: bash
+  if: ${{ github.ref == 'refs/heads/main' }}
   steps:
     - run: echo Hello ${{ inputs.greet }}.
       shell: bash
