@@ -7,6 +7,7 @@ import pulumi_aws.config
 import pulumi_aws.route53
 import pulumi_aws.s3
 
+
 def get_domain_and_subdomain(domain):
     """
     Returns the subdomain and the parent domain.
@@ -21,6 +22,7 @@ def get_domain_and_subdomain(domain):
     parts.pop(0)
     return subdomain, '.'.join(parts) + '.'
 
+
 # Read the configuration for this stack.
 stack_config = Config()
 stack = pulumi.get_stack()
@@ -30,23 +32,27 @@ certificate_arn = stack_config.get('certificateArn')
 tags = {"Environment": stack, "Name": target_domain}
 
 
-##Create Cloudfront Identity
-identity = pulumi_aws.cloudfront.OriginAccessIdentity("S3-identity", comment="S3-access")
+# Create Cloudfront Identity
+identity = pulumi_aws.cloudfront.OriginAccessIdentity(
+    "S3-identity",
+    comment="S3-access"
+)
 
 
 # Create an S3 bucket configured as a website bucket.
-content_bucket = pulumi_aws.s3.Bucket('contentBucket',
+content_bucket = pulumi_aws.s3.Bucket(
+    'contentBucket',
     bucket=target_domain,
     website=pulumi_aws.s3.BucketWebsiteArgs(
         index_document='index.html'
     ),
-    acl = "private",
-    versioning=pulumi_aws.s3.BucketVersioningArgs(
-        enabled=True),
-    tags = tags
-    )
+    acl="private",
+    versioning=pulumi_aws.s3.BucketVersioningArgs(enabled=True),
+    tags=tags
+)
 
-#def crawl_directory(content_dir, f):
+
+# def crawl_directory(content_dir, f):
 #    """
 #    Crawl `content_dir` (including subdirectories) and apply the function `f` to each file.
 #    """
@@ -58,8 +64,8 @@ content_bucket = pulumi_aws.s3.Bucket('contentBucket',
 #        elif os.path.isfile(filepath):
 #            f(filepath)
 #
-#web_contents_root_path = os.path.join(os.getcwd(), path_to_website_contents)
-#def bucket_object_converter(filepath):
+# web_contents_root_path = os.path.join(os.getcwd(), path_to_website_contents)
+# def bucket_object_converter(filepath):
 #    """
 #    Takes a file path and returns an bucket object managed by Pulumi
 #    """
@@ -77,7 +83,7 @@ content_bucket = pulumi_aws.s3.Bucket('contentBucket',
 #    )
 
 # Crawl the web content root path and convert the file paths to S3 object resources.
-#crawl_directory(web_contents_root_path, bucket_object_converter)
+# crawl_directory(web_contents_root_path, bucket_object_converter)
 
 TEN_MINUTES = 60 * 10
 
@@ -88,15 +94,21 @@ if certificate_arn is None:
     east_region = pulumi_aws.Provider('east', profile=pulumi_aws.config.profile, region='us-east-1')
 
     # Get a certificate for our website domain name.
-    certificate = pulumi_aws.acm.Certificate('certificate',
-        domain_name=target_domain, validation_method='DNS', opts=ResourceOptions(provider=east_region),tags=tags)
+    certificate = pulumi_aws.acm.Certificate(
+        'certificate',
+        domain_name=target_domain,
+        validation_method='DNS',
+        opts=ResourceOptions(provider=east_region),
+        tags=tags
+    )
 
     # Find the Route 53 hosted zone so we can create the validation record.
     subdomain, parent_domain = get_domain_and_subdomain(target_domain)
     hzid = pulumi_aws.route53.get_zone(name=parent_domain).id
 
     # Create a validation record to prove that we own the domain.
-    cert_validation_domain = pulumi_aws.route53.Record(f'{target_domain}-validation',
+    cert_validation_domain = pulumi_aws.route53.Record(
+        f'{target_domain}-validation',
         name=certificate.domain_validation_options.apply(
             lambda o: o[0].resource_record_name),
         zone_id=hzid,
@@ -104,22 +116,31 @@ if certificate_arn is None:
             lambda o: o[0].resource_record_type),
         records=[certificate.domain_validation_options.apply(
             lambda o: o[0].resource_record_value)],
-        ttl=TEN_MINUTES)
+        ttl=TEN_MINUTES
+    )
 
     # Create a special resource to await complete validation of the cert.
     # Note that this is not a real AWS resource.
-    cert_validation = pulumi_aws.acm.CertificateValidation('certificateValidation',
+    cert_validation = pulumi_aws.acm.CertificateValidation(
+        'certificateValidation',
         certificate_arn=certificate.arn,
         validation_record_fqdns=[cert_validation_domain.fqdn],
-        opts=ResourceOptions(provider=east_region))
+        opts=ResourceOptions(provider=east_region)
+    )
 
     certificate_arn = cert_validation.certificate_arn
 
 # Create a logs bucket for the CloudFront logs
-logs_bucket = pulumi_aws.s3.Bucket('requestLogs', bucket=f'{target_domain}-logs', acl='private',tags = tags)
+logs_bucket = pulumi_aws.s3.Bucket(
+    'requestLogs',
+    bucket=f'{target_domain}-logs',
+    acl='private',
+    tags=tags
+)
 
 # Create the CloudFront distribution
-cdn = pulumi_aws.cloudfront.Distribution('cdn',
+cdn = pulumi_aws.cloudfront.Distribution(
+    'cdn',
     enabled=True,
     aliases=[
         target_domain
@@ -146,7 +167,7 @@ cdn = pulumi_aws.cloudfront.Distribution('cdn',
         max_ttl=TEN_MINUTES,
     ),
     # PriceClass_100 is the lowest cost tier (US/EU only).
-    price_class= 'PriceClass_100',
+    price_class='PriceClass_100',
     # Use the certificate we generated for this distribution.
     viewer_certificate=pulumi_aws.cloudfront.DistributionViewerCertificateArgs(
         acm_certificate_arn=certificate_arn,
@@ -164,10 +185,11 @@ cdn = pulumi_aws.cloudfront.Distribution('cdn',
         include_cookies=False,
         prefix=f'${target_domain}/',
     ),
-    tags = tags,
+    tags=tags,
     # CloudFront typically takes 15 minutes to fully deploy a new distribution.
     # Skip waiting for that to complete.
     wait_for_deployment=False)
+
 
 def create_alias_record(target_domain, distribution):
     """
@@ -175,7 +197,8 @@ def create_alias_record(target_domain, distribution):
     """
     subdomain, parent_domain = get_domain_and_subdomain(target_domain)
     hzid = pulumi_aws.route53.get_zone(name=parent_domain).id
-    return pulumi_aws.route53.Record(target_domain,
+    return pulumi_aws.route53.Record(
+        target_domain,
         name=subdomain,
         zone_id=hzid,
         type='A',
@@ -188,35 +211,40 @@ def create_alias_record(target_domain, distribution):
         ]
     )
 
+
 alias_a_record = create_alias_record(target_domain, cdn)
 
-##Policy for bucket
-allow_cloudfront = pulumi_aws.iam.get_policy_document_output(statements=[pulumi_aws.iam.GetPolicyDocumentStatementArgs(
-    principals=[pulumi_aws.iam.GetPolicyDocumentStatementPrincipalArgs(
-        type="AWS",
-        identifiers=[identity.iam_arn],
-    )],
-    actions=[
-        "s3:GetObject",
-        "s3:ListBucket",
-    ],
-    resources=[
-        content_bucket.arn,
-        content_bucket.arn.apply(lambda arn: f"{arn}/*"),
-    ],
-)])
-allow_cdn = pulumi_aws.s3.BucketPolicy("allowAccessFromAnotherAccountBucketPolicy",
+# Policy for bucket
+allow_cloudfront = pulumi_aws.iam.get_policy_document_output(
+    statements=[pulumi_aws.iam.GetPolicyDocumentStatementArgs(
+        principals=[pulumi_aws.iam.GetPolicyDocumentStatementPrincipalArgs(
+            type="AWS",
+            identifiers=[identity.iam_arn],
+        )],
+        actions=[
+            "s3:GetObject",
+            "s3:ListBucket",
+        ],
+        resources=[
+            content_bucket.arn,
+            content_bucket.arn.apply(lambda arn: f"{arn}/*"),
+        ],
+    )]
+)
+allow_cdn = pulumi_aws.s3.BucketPolicy(
+    "allowAccessFromAnotherAccountBucketPolicy",
     bucket=content_bucket.id,
     policy=allow_cloudfront.json)
-#Export the bucket URL, bucket website endpoint, and the CloudFront distribution information.
+
+# Export test values
 export('content_bucket_url', Output.concat('s3://', content_bucket.bucket))
 export('content_bucket_website_endpoint', content_bucket.website_endpoint)
 export('cloudfront_domain', cdn.domain_name)
 export('target_domain_endpoint', f'https://{target_domain}/')
-export('identity',identity.iam_arn)
-export("identity.id",identity.id)
-export("s3",content_bucket.id)
-export("name",content_bucket.bucket_regional_domain_name)
-export("idy",identity.caller_reference)
-export("idy",identity.etag)
-export("idy",identity.comment)
+export('identity', identity.iam_arn)
+export("identity.id", identity.id)
+export("s3", content_bucket.id)
+export("name", content_bucket.bucket_regional_domain_name)
+export("idy", identity.caller_reference)
+export("idy", identity.etag)
+export("idy", identity.comment)
