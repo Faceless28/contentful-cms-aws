@@ -22,6 +22,10 @@ jobs:
           python-version: 3.9
       - run: pip install -r requirements.txt
       - run: echo $(pwd) && echo $stack_env
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          max-line-length: "120"
       - uses: pulumi/actions@v3
         with:
           command: up
