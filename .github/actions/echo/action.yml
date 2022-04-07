@@ -23,5 +23,5 @@ runs:
       run: |
           echo "stack_env=main" >> $GITHUB_ENV
           echo "flake8=true" >> $GITHUB_ENV
-          echo "bucket=cloud.notube.link.main" >> $GITHUB_ENV
+          echo "bucket=cloud.notubes.link.main" >> $GITHUB_ENV
       shell: bash
