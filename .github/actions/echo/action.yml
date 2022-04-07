@@ -17,7 +17,9 @@ runs:
       shell: bash
     - name: simple evaluation on dev
       if: github.ref == 'refs/heads/dev'
-      run: echo "stack_env=test" >> $GITHUB_ENV
+      run: |
+          echo "stack_env=test" >> $GITHUB_ENV
+          echo "flake8=true" >> $GITHUB_ENV
       shell: bash
     - name: simple evaluation on dev
       if: github.ref == 'refs/heads/dev'

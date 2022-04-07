@@ -24,6 +24,7 @@ jobs:
       - run: echo $(pwd) && echo $stack_env
       - name: flake8 Lint
         uses: py-actions/flake8@v2
+        if: github.ref == 'refs/heads/dev'
         with:
           max-line-length: "100"
       - uses: pulumi/actions@v3
