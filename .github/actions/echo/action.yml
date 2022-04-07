@@ -16,7 +16,7 @@ runs:
       run: |
           echo "stack_env=test" >> $GITHUB_ENV
           echo "flake8=true" >> $GITHUB_ENV
-          echo "bucket=cloud.notube.link" >> $GITHUB_ENV
+          echo "bucket=cloud.notubes.link" >> $GITHUB_ENV
       shell: bash
     - name: simple evaluation on dev
       if: github.ref == 'refs/heads/main'
