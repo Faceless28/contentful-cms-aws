@@ -1,4 +1,4 @@
-name: S3-Sync workflow
+name: S3 Sync workflow
 
 on:
   workflow_call:
