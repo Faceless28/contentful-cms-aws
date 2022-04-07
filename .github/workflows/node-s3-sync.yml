@@ -19,6 +19,7 @@ jobs:
       run:
         shell: bash
     steps:
+      - uses: ./.github/actions/echo/
       - uses: actions/download-artifact@v2
         with:
           name: my-build
