@@ -5,6 +5,8 @@ on:
     paths:
       - 'infra/**'
       - '.github/workflows/pulumi.yml'
+
+
 jobs:
   up:
     name: Update
@@ -24,7 +26,7 @@ jobs:
       - run: echo $(pwd) && echo $stack_env && echo $flake8
       - name: flake8 Lint
         uses: py-actions/flake8@v2
-        if: github.event_name == 'pull_request'
+        if: env.stack_env == 'true'
         with:
           max-line-length: "120"
       - uses: pulumi/actions@v3
