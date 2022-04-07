@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: 3.9
       - run: pip install -r requirements.txt
-      - run: echo $(pwd) && echo $stack_env
+      - run: echo $(pwd) && echo $stack_env && echo $flake8
       - name: flake8 Lint
         uses: py-actions/flake8@v2
         if: github.event_name == 'pull_request'
