@@ -30,4 +30,4 @@ jobs:
           aws-region: ${{ secrets.region }}
       - name: Copy files to the s3 website content bucket
         run:
-          aws s3 sync ./ s3://${{ secrets.bucket_name }}/ --delete
+          aws s3 sync ./ s3://${{ env.bucket }}/ --delete

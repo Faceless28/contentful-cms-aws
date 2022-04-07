@@ -2,7 +2,9 @@ name: Main Workflow
 
 on:
   push:
-    branches: [ dev ]
+    branches:
+      - dev
+      - main
     paths:
       - 'react-app/**'
       - '.github/workflows/node*.yml'

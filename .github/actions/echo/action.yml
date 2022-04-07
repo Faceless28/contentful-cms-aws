@@ -11,17 +11,17 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: simple evaluation on master
-      if: github.ref == 'refs/heads/main'
-      run: echo "runs"
-      shell: bash
     - name: simple evaluation on dev
       if: github.ref == 'refs/heads/dev'
       run: |
           echo "stack_env=test" >> $GITHUB_ENV
           echo "flake8=true" >> $GITHUB_ENV
+          echo "bucket=cloud.notube.link" >> $GITHUB_ENV
       shell: bash
     - name: simple evaluation on dev
-      if: github.ref == 'refs/heads/dev'
-      run: echo "$stack_env"
+      if: github.ref == 'refs/heads/main'
+      run: |
+          echo "stack_env=main" >> $GITHUB_ENV
+          echo "flake8=true" >> $GITHUB_ENV
+          echo "bucket=cloud.notube.link.main" >> $GITHUB_ENV
       shell: bash

@@ -1,12 +1,12 @@
 name: Pulumi Workflow
 on:
   push:
-    branches: [ dev ]
+    branches:
+      - dev
+      - main
     paths:
       - 'infra/**'
       - '.github/workflows/pulumi.yml'
-
-
 jobs:
   up:
     name: Update
