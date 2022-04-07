@@ -9,8 +9,6 @@ on:
         required: true
       region:
         required: true
-      bucket_name:
-        required: true
 
 jobs:
   deploy:
